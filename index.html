@@ -281,7 +281,7 @@
 
       <div class="icon-grid">
 
-        <a class="icon-item" href="https://www.linkedin.com/in/uarlemoliveira" aria-label="LinkedIn">
+        <a class="icon-item" href="https://www.linkedin.com/in/uarlemoliveira" onclick="return openLinkedIn(event,'www.linkedin.com/in/uarlemoliveira','https://www.linkedin.com/in/uarlemoliveira')" aria-label="LinkedIn">
           <span class="circle">
             <svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="3.25" y="3.25" width="17.5" height="17.5" rx="3.5"/>
@@ -294,7 +294,7 @@
           <span class="ilabel">LinkedIn</span>
         </a>
 
-        <a class="icon-item" href="https://www.instagram.com/esteelbr/" aria-label="Instagram esteel">
+        <a class="icon-item" href="https://www.instagram.com/esteelbr/" onclick="return tryApp(event,'instagram://user?username=esteelbr','https://www.instagram.com/esteelbr/')" aria-label="Instagram esteel">
           <span class="circle">
             <svg viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M4 8.2c0-1.6 1.15-2.95 2.7-3.15L9.3 4.7a5.2 5.2 0 0 1 5.4 0l2.6.35C18.85 5.25 20 6.6 20 8.2v7.1c0 1.6-1.15 2.95-2.7 3.15l-2.6.35a5.2 5.2 0 0 1-5.4 0l-2.6-.35C5.15 18.25 4 16.9 4 15.3z"/>
@@ -305,7 +305,7 @@
           <span class="ilabel">Instagram<br>esteel</span>
         </a>
 
-        <a class="icon-item" href="https://www.instagram.com/uarlem" aria-label="Instagram pessoal">
+        <a class="icon-item" href="https://www.instagram.com/uarlem" onclick="return tryApp(event,'instagram://user?username=uarlem','https://www.instagram.com/uarlem')" aria-label="Instagram pessoal">
           <span class="circle">
             <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M4 8.2c0-1.6 1.15-2.95 2.7-3.15L9.3 4.7a5.2 5.2 0 0 1 5.4 0l2.6.35C18.85 5.25 20 6.6 20 8.2v7.1c0 1.6-1.15 2.95-2.7 3.15l-2.6.35a5.2 5.2 0 0 1-5.4 0l-2.6-.35C5.15 18.25 4 16.9 4 15.3z"/>
@@ -348,5 +348,44 @@
   </footer>
 </div>
 
+
+<script>
+(function(){
+  function isMobile(){
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  }
+  function isAndroid(){
+    return /Android/i.test(navigator.userAgent);
+  }
+  window.tryApp = function(e, appUrl, webUrl){
+    if(!isMobile()) return true;
+    e.preventDefault();
+    var fallback = setTimeout(function(){
+      window.location.href = webUrl;
+    }, 1200);
+    document.addEventListener('visibilitychange', function onVis(){
+      if(document.hidden){
+        clearTimeout(fallback);
+        document.removeEventListener('visibilitychange', onVis);
+      }
+    });
+    window.location.href = appUrl;
+    return false;
+  };
+  // LinkedIn: Android needs an explicit intent:// hand-off to the app's own
+  // link handler (so it resolves the exact profile). iOS already resolves
+  // the plain https link straight to the profile via Universal Links when
+  // opened in Safari, so we leave it untouched there.
+  window.openLinkedIn = function(e, pathNoScheme, webUrl){
+    if(!isAndroid()) return true;
+    e.preventDefault();
+    var intentUrl = 'intent://' + pathNoScheme +
+      '#Intent;scheme=https;package=com.linkedin.android;S.browser_fallback_url=' +
+      encodeURIComponent(webUrl) + ';end';
+    window.location.href = intentUrl;
+    return false;
+  };
+})();
+</script>
 </body>
 </html>
